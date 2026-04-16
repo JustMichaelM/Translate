@@ -1,12 +1,18 @@
 import os
-from dotenv import load_dotenv
+from enum import Enum
 
 
-def envloader() -> str:
-    load_dotenv()
-    api_key = os.getenv("DEEPL_API_KEY")
+class EnvItems(str, Enum):
+    DEEPL_API_KEY = "DEEPL_API_KEY"
+    CLAUDE_API_KEY = "CLAUDE_API_KEY"
+    INPUT_FOLDER = "INPUT_FOLDER"
+    OUTPUT_FOLDER = "OUTPUT_FOLDER"
 
-    if not api_key:
-        raise ValueError("DEEPL_API_KEY nie został znaleziony w pliku .env!")
 
-    return api_key
+def envloader(item: EnvItems) -> str:
+    loaded_item = os.getenv(item.value)
+
+    if not loaded_item:
+        raise ValueError("Item not found in the .env file!")
+
+    return loaded_item
