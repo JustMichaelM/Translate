@@ -7,9 +7,7 @@ def main():
     translator_agent = Translator(api_key=api_key)
 
     result = translator_agent.translate(
-        path="/Users/michal/Documents/dev/python/Translate/e1-failed-hero.srt",
-        chunk=10,
-        target_lang="PL",
+        path="/Users/michal/Documents/dev/python/Translate/e1-failed-hero.srt", chunk=10
     )
 
     print(result)

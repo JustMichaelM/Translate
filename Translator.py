@@ -1,5 +1,6 @@
 import deepl
 import pysrt
+import re
 
 
 class Translator:
@@ -28,7 +29,7 @@ class Translator:
             else:
                 sub.text = translations.text
 
-    def translate(self, path: str, chunk: int, target_lang: str) -> str:
+    def translate(self, path: str, chunk: int, target_lang: str = "PL") -> str:
         """
         Translates an .srt file
 
