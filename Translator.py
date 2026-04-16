@@ -1,6 +1,7 @@
 import deepl
 import pysrt
 import re
+from NameHandling import NameHandling
 
 
 class Translator:
@@ -17,19 +18,74 @@ class Translator:
         subs = pysrt.open(path, encoding="utf-8")
         return subs
 
-    def __extract_texts(self, group: list) -> list[str]:
-        """Extracts texts from a group of strings"""
-        return [sub.text for sub in group]
+    def __extract_name_and_text(self, text: str) -> tuple[str, str]:
+        """
+        Extract character name and clean dialogue text
 
-    def __apply_translations(self, group: list, translations) -> None:
-        """Applies translations to a group of subtitles"""
+        Format: "dialogue text.  Character_Name"
+        Returns: (name, clean_text)
+        """
+        # Regex: two+ spaces, then name at the end
+        match = re.search(r"(.+?)\s{2,}([A-Za-z_]+)$", text)
+
+        if match:
+            clean_text = match.group(1).strip()
+            name = match.group(2).strip()
+            return name, clean_text
+
+        # If no name found, return empty string and full text
+        return "", text.strip()
+
+    def __apply_name_handling(
+        self, name: str, translated_text: str, mode: NameHandling
+    ) -> str:
+        """Apply selected name handling strategy"""
+        if not name:
+            return translated_text
+
+        if mode == NameHandling.REMOVE:
+            return translated_text
+
+        elif mode == NameHandling.PREFIX:
+            return f"{name}: {translated_text}"
+
+        return translated_text
+
+    def __extract_texts(self, group: list) -> tuple[list[str], list[str]]:
+        """
+        Extract texts and names from subtitle group
+        Returns: (list_of_names, list_of_clean_texts)
+        """
+        names = []
+        texts = []
+
+        for sub in group:
+            name, clean_text = self.__extract_name_and_text(sub.text)
+            names.append(name)
+            texts.append(clean_text)
+
+        return names, texts
+
+    def __apply_translations(
+        self, group: list, translations, names: list[str], name_mode: NameHandling
+    ) -> None:
+        """Apply translations to subtitle group with name handling"""
         for i, sub in enumerate(group):
             if isinstance(translations, list):
-                sub.text = translations[i].text
+                translated = translations[i].text
             else:
-                sub.text = translations.text
+                translated = translations.text
 
-    def translate(self, path: str, chunk: int, target_lang: str = "PL") -> str:
+            # Apply selected name strategy
+            sub.text = self.__apply_name_handling(names[i], translated, name_mode)
+
+    def translate(
+        self,
+        path: str,
+        chunk: int,
+        name_handling: NameHandling,
+        target_lang: str = "PL",
+    ) -> str:
         """
         Translates an .srt file
 
@@ -48,13 +104,11 @@ class Translator:
 
         for i in range(0, len(subs), chunk):
             group = subs[i : i + chunk]
-            texts = self.__extract_texts(group)
-
+            names, texts = self.__extract_texts(group)
             translations = self.translator.translate_text(
                 text=texts, target_lang=target_lang
             )
-
-            self.__apply_translations(group, translations)
+            self.__apply_translations(group, translations, names, name_handling)
 
             print(f"Translated subtitles {i + 1}-{min(i + chunk, len(subs))}")
 

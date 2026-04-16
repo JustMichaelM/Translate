@@ -1,5 +1,6 @@
 from Translator import Translator
 from envloader import envloader
+from NameHandling import NameHandling
 
 
 def main():
@@ -7,7 +8,9 @@ def main():
     translator_agent = Translator(api_key=api_key)
 
     result = translator_agent.translate(
-        path="/Users/michal/Documents/dev/python/Translate/e1-failed-hero.srt", chunk=10
+        path="/Users/michal/Documents/dev/python/Translate/e1-failed-hero.srt",
+        chunk=10,
+        name_handling=NameHandling.REMOVE,
     )
 
     print(result)
