@@ -1,8 +1,8 @@
 from dotenv import load_dotenv
-from Translator import Translator
+from Translator.Translator import Translator
 from envloader import envloader
 from NameHandling import NameHandling
-from SubtitlesExtractor import SubtitlesExtractor
+from Extractor.SubtitlesExtractor import SubtitlesExtractor
 
 
 def main():

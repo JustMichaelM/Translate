@@ -8,7 +8,9 @@ from Providers import TranslationProviderProtocol
 
 
 class Translator:
-    def __init__(self, provider: TranslationProviderProtocol):
+    def __init__(
+        self, provider: TranslationProviderProtocol, chunk: int, target_lang: str = "PL"
+    ):
         self.provider = provider
 
     def translate(self): ...
