@@ -5,22 +5,22 @@ from SubtitlesExtractor import SubtitlesExtractor
 
 
 def main():
-    folder_path: str = "/Users/michal/Documents/filmy/Anime/Moonlit Fantasy S1"
-    output_path: str = "/Users/michal/Documents/filmy/Anime/Moonlit Fantasy S1/Napisy"
-    # api_key: str = envloader()
-    # translator_agent = Translator(api_key=api_key)
+    # folder_path: str = ""
+    # output_path: str = ""
 
-    # result = translator_agent.translate(
-    #     path="/Users/michal/Documents/dev/python/Translate/e1-failed-hero.srt",
-    #     chunk=10,
-    #     name_handling=NameHandling.REMOVE,
+    # sub_extractor = SubtitlesExtractor()
+    # sub_extractor.extract_from_folder(
+    #     folder_path=folder_path, output_folder=output_path
     # )
 
-    # print(result)
+    api_key: str = envloader()
+    translator_agent = Translator(api_key=api_key)
 
-    sub_extractor = SubtitlesExtractor()
-    sub_extractor.extract_from_folder(
-        folder_path=folder_path, output_folder=output_path
+    translator_agent.translate_folder(
+        folder_path="/Users/michal/Documents/filmy/Anime/Moonlit Fantasy S2/Napisy",
+        chunk=10,
+        target_lang="PL",
+        name_handling=NameHandling.REMOVE,
     )
 
 

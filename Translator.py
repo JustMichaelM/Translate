@@ -1,6 +1,9 @@
 import deepl
 import pysrt
 import re
+import os
+from pathlib import Path
+from typing import Optional
 from NameHandling import NameHandling
 
 
@@ -118,3 +121,79 @@ class Translator:
         print(f"✅ Saved: {output_file}")
 
         return output_file
+
+    def translate_folder(
+        self,
+        folder_path: str,
+        chunk: int,
+        target_lang: str,
+        name_handling: NameHandling = NameHandling.PREFIX,
+        output_folder: Optional[str] = None,
+    ) -> list[str]:
+        """
+        Translate all .srt files in a folder
+
+        Args:
+            folder_path: Path to folder containing .srt files
+            chunk: How many subtitles to translate at once
+            target_lang: Target language code (e.g. 'PL', 'EN', 'JA')
+            name_handling: How to handle character names
+            output_folder: Where to save translated files (default: same as input)
+
+        Returns:
+            List of paths to translated files
+        """
+        folder = Path(folder_path)
+
+        if not folder.exists():
+            raise FileNotFoundError(f"Folder not found: {folder_path}")
+
+        if not folder.is_dir():
+            raise ValueError(f"Path is not a folder: {folder_path}")
+
+        # Find all .srt files
+        srt_files = list(folder.glob("*.srt"))
+
+        if not srt_files:
+            print(f"⚠️  No .srt files found in: {folder_path}")
+            return []
+
+        print(f"Found {len(srt_files)} .srt file(s)")
+
+        # Translate each file
+        translated_files = []
+        for srt_file in srt_files:
+            try:
+                print(f"\n{'=' * 50}")
+                print(f"Processing: {srt_file.name}")
+                print("=" * 50)
+
+                output_path = self.translate(
+                    path=str(srt_file),
+                    chunk=chunk,
+                    target_lang=target_lang,
+                    name_handling=name_handling,
+                )
+
+                # Move to output folder if specified
+                if output_folder:
+                    os.makedirs(output_folder, exist_ok=True)
+                    new_path = os.path.join(
+                        output_folder, os.path.basename(output_path)
+                    )
+                    os.rename(output_path, new_path)
+                    output_path = new_path
+
+                translated_files.append(output_path)
+
+            except Exception as e:
+                print(f"❌ Failed to translate {srt_file.name}: {e}")
+                continue
+
+        print(f"\n{'=' * 50}")
+        print(
+            f"✅ Successfully translated {len(translated_files)}/{len(srt_files)} files"
+        )
+        print("=" * 50)
+
+        return translated_files
