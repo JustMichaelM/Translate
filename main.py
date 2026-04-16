@@ -6,11 +6,13 @@ def main():
     api_key: str = envloader()
     translator_agent = Translator(api_key=api_key)
 
-    text = "Hello World"
-    result = translator_agent.translate(text=text, target_lang="PL")
+    result = translator_agent.translate(
+        path="/Users/michal/Documents/dev/python/Translate/e1-failed-hero.srt",
+        chunk=10,
+        target_lang="PL",
+    )
 
-    print(f"Angielski: {text}")
-    print(f"Tłumaczenie {result}")
+    print(result)
 
 
 if __name__ == "__main__":
